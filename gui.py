@@ -94,4 +94,8 @@ def create_gui():
     root.geometry("800x600")
     root.mainloop()
 
-create_gui()
+def main():
+    create_gui()
+
+if __name__ == "__main__":
+    main()
