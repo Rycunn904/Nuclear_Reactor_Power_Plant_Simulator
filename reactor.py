@@ -46,19 +46,20 @@ class Reactor():
 
     def toggle_move_rods_up(self):
         """Move control rods up (insert more)."""
-        if self.rodMovementRate == "DOWN":
-            self.rodMovementRate = "IDLE"
-            self.controlRodPosition = int(self.controlRodPosition)
-        elif self.rodMovementRate == "IDLE":
-            self.rodMovementRate = "UP"
-
-    def toggle_move_rods_down(self):
-        """Move control rods down (withdraw less)."""
         if self.rodMovementRate == "UP":
             self.rodMovementRate = "IDLE"
             self.controlRodPosition = int(self.controlRodPosition)
         elif self.rodMovementRate == "IDLE":
             self.rodMovementRate = "DOWN"
+
+    def toggle_move_rods_down(self):
+        """Move control rods down (withdraw less)."""
+        if self.rodMovementRate == "DOWN":
+            self.rodMovementRate = "IDLE"
+            self.controlRodPosition = int(self.controlRodPosition)
+        elif self.rodMovementRate == "IDLE":
+            self.controlRodPosition += 0.5
+            self.rodMovementRate = "UP"
             
     
     def toggle_reactor(self):
@@ -76,12 +77,12 @@ class Reactor():
     
     def update(self):
         # Control Rod Movement
-        if self.rodMovementRate == "UP":
+        if self.rodMovementRate == "DOWN":
             if self.controlRodPosition >= 100.0:
                 self.controlRodPosition = 100.0
             else:
                 self.controlRodPosition = round(self.controlRodPosition + 0.02, 2)
-        elif self.rodMovementRate == "DOWN":
+        elif self.rodMovementRate == "UP":
             if self.controlRodPosition <= 0.0:
                 self.controlRodPosition = 0.0
             else:

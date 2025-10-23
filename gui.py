@@ -15,32 +15,50 @@ def update_status():
     turbine.update(reactor.powerOutput)
 
 def create_gui():
-    status_label = tk.Label(root, text="Reactor Status")
-    status_label.place(x=0, y=0)
+    stat_frame = tk.Frame(root, bg="lightgray", borderwidth=3, relief="ridge")
+    stat_frame.place(x=5, y=5)
 
-    temp_label = tk.Label(root, text="Temperature: 0°C")
-    temp_label.place(x=0, y=20)
+    primary_func = tk.Frame(root, bg="lightgray", borderwidth=3, relief="ridge")
+    primary_func.place(x=5, y=160)
 
-    power_label = tk.Label(root, text="Power Output: 0 MW")
-    power_label.place(x=0, y=40)
+    status_label = tk.Label(stat_frame, text="Reactor Status", bg="lightgray")
+    status_label.pack(anchor="w")
 
-    rod_label = tk.Label(root, text="Control Rod Position: 0%")
-    rod_label.place(x=0, y=60)
+    temp_label = tk.Label(stat_frame, text="Temperature: 0°C", bg="lightgray")
+    temp_label.pack(anchor="w")
 
-    cv_label = tk.Label(root, text="Coolant Valve: Open")
-    cv_label.place(x=150, y=60)
+    power_label = tk.Label(stat_frame, text="Power Output: 0 MW", bg="lightgray")
+    power_label.pack(anchor="w")
 
-    ignition_button = tk.Button(root, text="Toggle Reactor", command=lambda: reactor.toggle_reactor())
-    ignition_button.place(x=0, y=80)
+    rod_label = tk.Label(stat_frame, text="Control Rod Position: 0%", bg="lightgray")
+    rod_label.pack(anchor="w")
 
-    rod_up_button = tk.Button(root, text="Start Raising Control Rods", command=lambda: reactor.toggle_move_rods_down())
-    rod_up_button.place(x=0, y=105)
+    rod_movement_label = tk.Label(stat_frame, text="Control Rod Movement: IDLE", bg="lightgray")
+    rod_movement_label.pack(anchor="w")
 
-    rod_down_button = tk.Button(root, text="Start Lowering Control Rods", command=lambda: reactor.toggle_move_rods_up())
-    rod_down_button.place(x=0, y=130)
+    cv_label = tk.Label(stat_frame, text="Coolant Valve: Closed", bg="lightgray")
+    cv_label.pack(anchor="w")
 
-    coolant_valve_button = tk.Button(root, text="Open/Close Coolant Valve",  command=lambda: reactor.toggle_coolant_valve())
-    coolant_valve_button.place(x=0, y=155)
+    pump_label = tk.Label(stat_frame, text="Pumps A/B: 0/0", bg="lightgray")
+    pump_label.pack(anchor="w")
+
+    ignition_button = tk.Button(primary_func, text="Toggle Reactor", command=lambda: reactor.toggle_reactor())
+    ignition_button.pack()
+
+    rod_up_button = tk.Button(primary_func, text="Start Raising Control Rods", command=lambda: reactor.toggle_move_rods_down())
+    rod_up_button.pack()
+
+    rod_down_button = tk.Button(primary_func, text="Start Lowering Control Rods", command=lambda: reactor.toggle_move_rods_up())
+    rod_down_button.pack()
+
+    coolant_valve_button = tk.Button(primary_func, text="Open/Close Coolant Valve",  command=lambda: reactor.toggle_coolant_valve())
+    coolant_valve_button.pack()
+
+    pump_alpha_button = tk.Button(primary_func, text="Toggle Pump A", command=lambda: reactor.toggle_pump_alpha())
+    pump_alpha_button.pack()
+
+    pump_beta_button = tk.Button(primary_func, text="Toggle Pump B", command=lambda: reactor.toggle_pump_beta())
+    pump_beta_button.pack()
 
     # show turbine info on the right side
     turbine_label = tk.Label(root, text="Turbine Status")
@@ -64,6 +82,8 @@ def create_gui():
         temp_label.config(text=f"Temperature: {reactor.temperature:.1f}°C")
         power_label.config(text=f"Power Output: {reactor.powerOutput:.0f} MW")
         rod_label.config(text=f"Control Rod Position: {int(reactor.controlRodPosition)}%")
+        rod_movement_label.config(text=f"Control Rod Movement: {reactor.rodMovementRate}")
+        pump_label.config(text=f"Pumps A/B: {"1" if reactor.pumpA else "0"}/{"1" if reactor.pumpB else "0"}")
         turbine_rpm_label.config(text=f"Turbine RPM: {turbine.rpm:.0f}")
         turbine_power_label.config(text=f"Turbine Power Output: {turbine.powerOutput:.2f} MW")
         turbine_valve_label.config(text=f"Turbine Valve Position: {turbine.valve*100:.0f}%")
