@@ -1,6 +1,4 @@
-import pygame
 import random
-import math
 
 class Reactor():
     def __init__(self, meltdownTemperature=3120, meltdownSafety=325):
@@ -101,12 +99,13 @@ class Reactor():
             self.status = "Offline"
 
         # Update coolant based off Pump stations and CV status
-        self.coolantFlowRate = 0.0
         if self.cvOpen:
-            if self.pumpA:
-                self.coolantFlowRate += 50
-            if self.pumpB:
-                self.coolantFlowRate += 50
+            if self.pumpA ^ self.pumpB:
+                self.coolantFlowRate = 50
+            elif self.pumpA and self.pumpB:
+                self.coolantFlowRate = 100
+            else:
+                self.coolantFlowRate = 0
         else:
             self.coolantFlowRate = 0.0
 
@@ -115,10 +114,11 @@ class Reactor():
         # heat up or cool down based on rod position and coolant flow, uses a reactivity model.
         if self.inStartup:
             self.temperature += 1
+            self.powerOutput = self.temperature * 3
             if self.temperature >= 625:
                 self.inStartup = False
         elif self.isActive:
-            self.reactivity = (100 - int(self.controlRodPosition) - ((self.coolantFlowRate / 2) - self.heatLoss)) / 100
+            self.reactivity = (100 - int(self.controlRodPosition) - ((self.coolantFlowRate / 2) - self.heatLoss)) / 500
             self.temperature += ((self.reactivity + self.meltdownReactivity) * 10)/2
             self.powerOutput = self.temperature * 3
 
