@@ -10,6 +10,9 @@ turbine = Turbine.Turbine(root)
 
 framerate = 60
 
+def scram(event):
+    reactor.scram()
+
 def update_status():
     reactor.update()
     turbine.update(reactor.powerOutput)
@@ -80,7 +83,7 @@ def create_gui():
     turbine_valve_label = tk.Label(turbine_panel, text="Turbine Valve Position: 0%", bg="lightgray")
     turbine_valve_label.pack(anchor="w")
 
-    turbine_valve_scale = tk.Scale(root, length=200, from_=0, to=100, resolution=1, orient=tk.HORIZONTAL, label="Turbine Valve", command=lambda val: setattr(turbine, 'valve', float(val)/100))
+    turbine_valve_scale = tk.Scale(root, length=200, from_=0, to=100, resolution=1, orient=tk.HORIZONTAL, label="Turbine Valve", command=lambda val: turbine.set_valve(float(val)/100))
     turbine_valve_scale.place(x=250, y=100)
 
     turbine_grid_sync = tk.Button(grid_panel, text="Sync to grid", command=lambda: turbine.grid_sync())
@@ -91,6 +94,17 @@ def create_gui():
 
     turbine_breaker_open = tk.Button(grid_panel, text="Open Breaker", command=lambda: turbine.open_breaker())
     turbine_breaker_open.pack()
+
+    # AZ-5 Canvas
+
+    az5_canvas = tk.Canvas(root, width=75, height=85, bg="black")
+    az5_canvas.place(x=171, y=100)
+
+    az5_canvas.create_oval(8,8,70,70, fill="#FF0000", outline="#A40000", width=3, tags="1")
+    az5_canvas.create_line(17,17,60,60, fill="#A40000", width=5)
+    az5_canvas.create_text(75/2,80, text="AZ-5", fill="#FFFFFF")
+
+    az5_canvas.bind("<Button-1>", scram)
 
     def refresh():
         update_status()
@@ -126,3 +140,5 @@ def create_gui():
     refresh()
     root.geometry("800x600")
     root.mainloop()
+
+create_gui()

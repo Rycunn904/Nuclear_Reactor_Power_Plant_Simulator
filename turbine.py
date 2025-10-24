@@ -4,6 +4,7 @@ class Turbine:
     def __init__(self, root):
         self.rpm = 0.0 # Revolutions per minute
         self.valve = 0.0
+        self.target = 0.0
         self.flow = 0.0
         self.powerOutput = 0.0
         self.hertz = 0.0
@@ -16,6 +17,10 @@ class Turbine:
         self.repairTimer = 0
 
     def update(self, reactorPower):
+        if self.target < self.valve:
+            self.valve = round(self.valve - 0.0001, 4)
+        elif self.target > self.valve:
+            self.valve = round(self.valve + 0.0001, 4)
         if not self.exploded and not self.synced and not self.triped:
             self.flow = ((reactorPower / 1000) * 1.8) * self.valve
             self.rpm += self.flow - (self.rpm / 1000)  # Simplified RPM calculation
@@ -25,8 +30,9 @@ class Turbine:
                 self.exploded = True
             if self.flow >= 20:
                 self.trip()
-        elif self.exploded and self.rpm == 0:
+        elif self.exploded and self.rpm <= 0:
             if self.repairTimer < 5000 and self.bladeBackups > 0:
+                self.rpm = 0
                 self.repairTimer += 1
             elif self.repairTimer >= 5000 and self.bladeBackups > 0:
                 self.exploded = False
@@ -35,7 +41,10 @@ class Turbine:
         elif self.exploded or self.triped:
             self.valve = 0.0
             self.flow = 0.0
-            self.rpm += -1
+            if self.exploded:
+                self.rpm -= 5
+            else:
+                self.rpm += -1
             self.powerOutput = 0
             self.hertz = self.rpm / 50
             if self.triped and not self.exploded and self.rpm == 0:
@@ -48,7 +57,9 @@ class Turbine:
             self.hertz = 60
             if self.powerOutput < 150:
                 self.trip()
-        
+    
+    def set_valve(self, value):
+        self.target = value    
 
     def grid_sync(self):
         if 80 < self.syncroscope.angle < 100 and 2990 < self.rpm < 3010 and not self.triped and not self.exploded:
