@@ -10,8 +10,10 @@ def test_scram_3120_nomelt():
 
     reactor.scram()
 
-    reactor.toggle_pump_alpha()
-    reactor.toggle_pump_beta()
+    reactor.pumpA = True
+    reactor.pumpAspeed = 1
+    reactor.pumpB = True
+    reactor.pumpBspeed = 1
     reactor.toggle_coolant_valve()
 
     assert reactor.scramEngaged == True
@@ -38,8 +40,10 @@ def test_scram_4200_nomelt():
 
     reactor.scram()
 
-    reactor.toggle_pump_alpha()
-    reactor.toggle_pump_beta()
+    reactor.pumpA = True
+    reactor.pumpAspeed = 1
+    reactor.pumpB = True
+    reactor.pumpBspeed = 1
     reactor.toggle_coolant_valve()
 
     assert reactor.scramEngaged == True
@@ -66,8 +70,10 @@ def test_scram_5000_melt():
 
     reactor.scram()
 
-    reactor.toggle_pump_alpha()
-    reactor.toggle_pump_beta()
+    reactor.pumpA = True
+    reactor.pumpAspeed = 1
+    reactor.pumpB = True
+    reactor.pumpBspeed = 1
     reactor.toggle_coolant_valve()
 
     assert reactor.scramEngaged == True
@@ -103,8 +109,10 @@ def test_reactor_startup_and_shutdown():
     assert reactor.inStartup == False
 
     reactor.controlRodPosition = 55.0 # Adjust control rods for normal operation
-    reactor.toggle_pump_alpha()
-    reactor.toggle_pump_beta()
+    reactor.pumpA = True
+    reactor.pumpAspeed = 1
+    reactor.pumpB = True
+    reactor.pumpBspeed = 1
     reactor.toggle_coolant_valve()
 
     assert reactor.pumpA
@@ -129,3 +137,46 @@ def test_reactor_startup_and_shutdown():
     assert reactor.temperature < 100
     assert reactor.powerOutput == 0.0
     assert reactor.controlRodPosition == 100.0
+
+def test_normal_op_no_delta():
+    reactor = Reactor()
+
+    # Initial state checks
+    assert reactor.isActive == False
+    assert reactor.temperature == 20
+    assert reactor.powerOutput == 0
+    assert reactor.controlRodPosition == 100.0
+
+    # Start the reactor
+    reactor.toggle_reactor()
+    assert reactor.isActive == True
+    assert reactor.inStartup == True
+    assert reactor.controlRodPosition == 100.0
+
+    # Simulate startup phase
+    while reactor.temperature < 1420: # Simulate enough updates to reach 1420
+        reactor.update()
+    
+    assert reactor.temperature >= 625
+    assert reactor.inStartup == False
+
+    reactor.controlRodPosition = 55.0 # Adjust control rods for normal operation
+    reactor.pumpA = True
+    reactor.pumpAspeed = 1
+    reactor.pumpB = True
+    reactor.pumpBspeed = 1
+    reactor.toggle_coolant_valve()
+
+    assert reactor.pumpA
+    assert reactor.pumpB
+    assert reactor.cvOpen
+
+    temp = reactor.temperature
+
+    reactor.randomDelta = 0
+
+    # Simulate normal operation for a while
+    for _ in range(10000):
+        reactor.update()
+    
+    assert reactor.temperature == temp

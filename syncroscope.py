@@ -2,7 +2,7 @@ import tkinter as tk
 import math
 
 class Syncroscope:
-    def __init__(self, root, turbine):
+    def __init__(self, root: tk.Tk, turbine) -> None:
         self.root = root
 
         self.turbine = turbine

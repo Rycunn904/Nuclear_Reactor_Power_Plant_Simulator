@@ -27,6 +27,9 @@ def create_gui(debug=False):
 
         debug_3 = tk.Label(root, text="Angle = --")
         debug_3.pack()
+
+        debug_4 = tk.Label(root, text="Random Delta = ?")
+        debug_4.pack()
     stat_frame = tk.Frame(root, bg="lightgray", borderwidth=3, relief="ridge")
     stat_frame.place(x=5, y=5)
 
@@ -96,13 +99,16 @@ def create_gui(debug=False):
     turbine_valve_scale.place(x=250, y=100)
 
     turbine_grid_sync = tk.Button(grid_panel, text="Sync to grid", command=lambda: turbine.grid_sync())
-    turbine_grid_sync.pack()
+    turbine_grid_sync.grid(column=1,row=1)
 
     turbine_trip = tk.Button(grid_panel, text="Trip Turbine", command=lambda: turbine.trip())
-    turbine_trip.pack()
+    turbine_trip.grid(column=2,row=1)
 
     turbine_breaker_open = tk.Button(grid_panel, text="Open Breaker", command=lambda: turbine.open_breaker())
-    turbine_breaker_open.pack()
+    turbine_breaker_open.grid(column=1,row=2)
+
+    turbine_breaker_close = tk.Button(grid_panel, text="Close Breaker", command=lambda: turbine.close_breaker())
+    turbine_breaker_close.grid(column=2,row=2)
 
     # AZ-5 Canvas
 
@@ -136,12 +142,12 @@ def create_gui(debug=False):
         status_label.config(text=f"Reactor {reactor.status}")
         temp_label.config(text=f"Temperature: {reactor.temperature:.1f}°C")
         power_label.config(text=f"Power Output: {reactor.powerOutput:.0f} MW")
-        rod_label.config(text=f"Control Rod Position: {reactor.controlRodPosition}%")
+        rod_label.config(text=f"Control Rod Position: {int(reactor.controlRodPosition)}%")
         rod_movement_label.config(text=f"Control Rod Movement: {reactor.rodMovementRate}")
-        pump_label.config(text=f"Pumps A/B: {"ON" if reactor.pumpA else "OFF"}/{"ON" if reactor.pumpB else "OFF"}")
+        pump_label.config(text=f"Pumps A/B: {reactor.pumpAspeed}/{reactor.pumpBspeed}")
         turbine_label.config(text=f"Turbine Status: {turb_stat}")
         turbine_rpm_label.config(text=f"Turbine RPM: {turbine.rpm:.0f}")
-        turbine_power_label.config(text=f"Turbine Power Output: {turbine.powerOutput:.2f} MW")
+        turbine_power_label.config(text=f"Turbine Power Output: {turbine.powerOutput:.0f} MW")
         turbine_valve_label.config(text=f"Turbine Valve Position: {turbine.valve*100:.0f}%")
         cv_label.config(text=f"Coolant Valve: {"Open" if reactor.cvOpen else "Closed"}")
 
@@ -149,6 +155,7 @@ def create_gui(debug=False):
             debug_1.config(text=f"Reactivity = {reactor.reactivity}") # pyright: ignore[reportPossiblyUnboundVariable]
             debug_2.config(text=f"Metldown Reactivity = {reactor.meltdownReactivity}") # pyright: ignore[reportPossiblyUnboundVariable]
             debug_3.config(text=f"Angle = {turbine.syncroscope.angle}") # pyright: ignore[reportPossiblyUnboundVariable]
+            debug_4.config(text=f"Random Delta = {reactor.randomDelta}") # pyright: ignore[reportPossiblyUnboundVariable]
 
         root.after(int(1000/framerate), refresh)
 

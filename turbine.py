@@ -2,9 +2,10 @@ try:
     from Nuclear_Reactor_Power_Plant_Simulator.syncroscope import Syncroscope
 except:
     from syncroscope import Syncroscope
+import tkinter
 
 class Turbine:
-    def __init__(self, root):
+    def __init__(self, root: tkinter.Tk) -> None:
         self.rpm = 0.0 # Revolutions per minute
         self.valve = 0.0
         self.target = 0.0

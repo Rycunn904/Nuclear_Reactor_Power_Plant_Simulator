@@ -1,10 +1,11 @@
 import random
 
-class Reactor():
+class Reactor:
     def __init__(self, meltdownTemperature=3120, meltdownSafety=325):
         self.status = "Offline"
 
         self.randomDelta = random.uniform(-0.001, 0.001) # Small random fluctuation
+        self.stable = False
 
         self.reactivity = 0.0 # Initial reactivity
         self.meltdownReactivity = 0.0 # Additional reactivity during meltdown
@@ -13,9 +14,15 @@ class Reactor():
         self.powerOutput = 0 # Initial power output in MW
 
         self.controlRodPosition = 100.0 # Control rods fully inserted (0-100%)
+        self.rodsCanMove = False
         self.coolantFlowRate = 100.0 # Coolant flow rate percentage (0-100%)
+
         self.pumpA = False
+        self.pumpAspeed = 0
+
         self.pumpB = False
+        self.pumpBspeed = 0
+
         self.cvOpen = False
         self.rodMovementRate = "IDLE" # Direction of rod movement
 
@@ -44,20 +51,22 @@ class Reactor():
 
     def toggle_move_rods_up(self):
         """Move control rods up (insert more)."""
-        if self.rodMovementRate == "UP":
-            self.rodMovementRate = "IDLE"
-            self.controlRodPosition = int(self.controlRodPosition)
-        elif self.rodMovementRate == "IDLE":
-            self.rodMovementRate = "DOWN"
+        if self.rodsCanMove:
+            if self.rodMovementRate == "UP":
+                self.rodMovementRate = "IDLE"
+                self.controlRodPosition = int(self.controlRodPosition)
+            elif self.rodMovementRate == "IDLE":
+                self.rodMovementRate = "DOWN"
 
     def toggle_move_rods_down(self):
         """Move control rods down (withdraw less)."""
-        if self.rodMovementRate == "DOWN":
-            self.rodMovementRate = "IDLE"
-            self.controlRodPosition = int(self.controlRodPosition)
-        elif self.rodMovementRate == "IDLE":
-            self.controlRodPosition += 0.5
-            self.rodMovementRate = "UP"
+        if self.rodsCanMove:
+            if self.rodMovementRate == "DOWN":
+                self.rodMovementRate = "IDLE"
+                self.controlRodPosition = int(self.controlRodPosition)
+            elif self.rodMovementRate == "IDLE":
+                self.controlRodPosition += 0.5
+                self.rodMovementRate = "UP"
             
     
     def toggle_reactor(self):
@@ -71,10 +80,32 @@ class Reactor():
         else:
             self.inStartup = True
             self.isActive = True
-            self.controlRodPosition = 55.0  # Start with rods at stable position
     
     def update(self):
+        # Coolant pump speed
+        if self.pumpA and self.pumpAspeed < 1:
+            self.pumpAspeed = round(self.pumpAspeed + 0.001, 3)
+        elif self.pumpA and self.pumpAspeed >= 1:
+            self.pumpAspeed = 1
+        elif not self.pumpA and self.pumpAspeed > 0:
+            self.pumpAspeed = round(self.pumpAspeed - 0.001, 3)
+        elif not self.pumpA and self.pumpAspeed <= 0:
+            self.pumpAspeed = 0
+
+        if self.pumpB and self.pumpBspeed < 1:
+            self.pumpBspeed = round(self.pumpBspeed + 0.001, 3)
+        elif self.pumpB and self.pumpBspeed >= 1:
+            self.pumpBspeed = 1
+        elif not self.pumpB and self.pumpBspeed > 0:
+            self.pumpBspeed = round(self.pumpBspeed - 0.001, 3)
+        elif not self.pumpB and self.pumpBspeed <= 0:
+            self.pumpBspeed = 0
+
         # Control Rod Movement
+        if not self.rodsCanMove:
+            self.rodMovementRate = "N/A"
+        elif self.rodMovementRate == "N/A":
+            self.rodMovementRate = "IDLE"
         if self.rodMovementRate == "DOWN":
             if self.controlRodPosition >= 100.0:
                 self.controlRodPosition = 100.0
@@ -101,17 +132,7 @@ class Reactor():
             self.status = "Offline"
 
         # Update coolant based off Pump stations and CV status
-        if self.cvOpen:
-            if self.pumpA ^ self.pumpB:
-                self.coolantFlowRate = 50
-            elif self.pumpA and self.pumpB:
-                self.coolantFlowRate = 100
-            else:
-                self.coolantFlowRate = 0
-        else:
-            self.coolantFlowRate = 0.0
-
-        """Update reactor state based on time step and user input."""
+        self.coolantFlowRate = ((self.pumpAspeed * 50) + (self.pumpBspeed * 50)) * (1 if self.cvOpen else 0)
         
         # heat up or cool down based on rod position and coolant flow, uses a reactivity model.
         if self.inStartup:
@@ -119,13 +140,19 @@ class Reactor():
             self.powerOutput = self.temperature * 3
             if self.temperature >= 625:
                 self.inStartup = False
+                self.rodsCanMove = True
         elif self.isActive:
             self.reactivity = (100 - int(self.controlRodPosition) - ((self.coolantFlowRate / 2) - self.heatLoss)) / 500
             self.temperature += ((self.reactivity + self.meltdownReactivity) * 10)/2
             self.powerOutput = self.temperature * 3
 
             if self.reactivity == 0:
+                if not self.stable:
+                    self.randomDelta = random.uniform(-0.001, 0.001)
+                    self.stable = True
                 self.temperature += self.randomDelta # Minor fluctuations when stable
+            else:
+                self.stable = False
 
             # Power output is proportional to reactivity and temperature
         else:
