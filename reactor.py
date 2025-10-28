@@ -6,26 +6,26 @@ class Reactor():
 
         self.randomDelta = random.uniform(-0.001, 0.001) # Small random fluctuation
 
-        self.reactivity = 0.0  # Initial reactivity
+        self.reactivity = 0.0 # Initial reactivity
         self.meltdownReactivity = 0.0 # Additional reactivity during meltdown
 
-        self.temperature = 20  # Initial temperature in Celsius
-        self.powerOutput = 0   # Initial power output in MW
+        self.temperature = 20 # Initial temperature in Celsius
+        self.powerOutput = 0 # Initial power output in MW
 
-        self.controlRodPosition = 100.0  # Control rods fully inserted (0-100%)
-        self.coolantFlowRate = 100.0  # Coolant flow rate percentage (0-100%)
+        self.controlRodPosition = 100.0 # Control rods fully inserted (0-100%)
+        self.coolantFlowRate = 100.0 # Coolant flow rate percentage (0-100%)
         self.pumpA = False
         self.pumpB = False
         self.cvOpen = False
         self.rodMovementRate = "IDLE" # Direction of rod movement
 
-        self.isActive = False  # Reactor is initially off
+        self.isActive = False # Reactor is initially off
         self.inStartup = False # Reactor is not in startup phase
 
-        self.heatLoss = 5.0  # W/°C, heat loss to environment
+        self.heatLoss = 5.0 # W/°C, heat loss to environment
 
-        self.meltdownTemperature = meltdownTemperature  # Meltdown temperature in Celsius
-        self.meltdownWarning = 2100 # Temperature to trigger warning
+        self.meltdownTemperature = meltdownTemperature # Meltdown temperature in Celsius
+        self.meltdownWarning = 2120 # Temperature to trigger warning
         self.meltdownSafety = meltdownSafety # Temperature to successfully SCRAM
         self.inMeltdown = False
 
@@ -87,7 +87,9 @@ class Reactor():
                 self.controlRodPosition = round(self.controlRodPosition - 0.02, 2)
 
         # Reactor Status Update
-        if self.inMeltdown:
+        if self.scramEngaged:
+            self.status = "SCRAM"
+        elif self.inMeltdown:
             self.status = "Temp Critical"
         elif self.temperature >= self.meltdownWarning:
             self.status = "Temp High"
@@ -129,20 +131,20 @@ class Reactor():
         else:
             self.powerOutput = 0
             if self.temperature > 20:
-                self.temperature -= 1  # Cool down when off
+                self.temperature -= 1 # Cool down when off
             else:
                 self.temperature = 20 # Ambient temperature
         
         if self.temperature > self.meltdownTemperature and not self.inMeltdown:
             self.inMeltdown = True
-            self.meltdownReactivity = 0.44 # Increase reactivity during meltdown
+            self.meltdownReactivity = 0.1 # Increase reactivity during meltdown
         
         # SCRAM procedure
         if self.scramEngaged:
             if self.temperature > self.meltdownSafety:
                 self.inMeltdown = True
                 self.controlRodPosition = 100
-                self.meltdownReactivity = 0.41
+                self.meltdownReactivity = 0.0
             elif self.temperature <= self.meltdownSafety and self.scramFrame < self.scramFail:
                 self.inMeltdown = False
                 self.scramEngaged = False

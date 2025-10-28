@@ -29,15 +29,15 @@ class Syncroscope:
             self.canvas.create_line(x1, y1, x2, y2, fill="black", width=3)
             
         # Draws the green sync lines
-        x1 = 150 + 90 * math.cos(math.radians(80))
-        y1 = 150 - 90 * math.sin(math.radians(80))
-        x2 = 150 + 100 * math.cos(math.radians(80))
-        y2 = 150 - 100 * math.sin(math.radians(80))
+        x1 = 150 + 90 * math.cos(math.radians(86))
+        y1 = 150 - 90 * math.sin(math.radians(86))
+        x2 = 150 + 100 * math.cos(math.radians(86))
+        y2 = 150 - 100 * math.sin(math.radians(86))
         self.canvas.create_line(x1, y1, x2, y2, fill="green", width=3)
-        x1 = 150 + 90 * math.cos(math.radians(100))
-        y1 = 150 - 90 * math.sin(math.radians(100))
-        x2 = 150 + 100 * math.cos(math.radians(100))
-        y2 = 150 - 100 * math.sin(math.radians(100))
+        x1 = 150 + 90 * math.cos(math.radians(94))
+        y1 = 150 - 90 * math.sin(math.radians(94))
+        x2 = 150 + 100 * math.cos(math.radians(94))
+        y2 = 150 - 100 * math.sin(math.radians(94))
         self.canvas.create_line(x1, y1, x2, y2, fill="green", width=3)
         
         # Create the needle
@@ -53,8 +53,10 @@ class Syncroscope:
         self.angle += self.temp  # Adjust speed by changing this value
         if self.angle >= 360:
             self.angle -= 360
+        if self.angle < 0:
+            self.angle += 360
         
-        if 80 < self.angle < 100:
+        if 86 < self.angle < 94:
             self.canvas.delete(self.ind1)
             self.ind1 = self.canvas.create_oval(30,30,60,60,fill="yellow")
         else:

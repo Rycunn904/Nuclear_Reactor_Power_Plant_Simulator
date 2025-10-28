@@ -1,4 +1,7 @@
-from syncroscope import Syncroscope
+try:
+    from Nuclear_Reactor_Power_Plant_Simulator.syncroscope import Syncroscope
+except:
+    from syncroscope import Syncroscope
 
 class Turbine:
     def __init__(self, root):
@@ -18,9 +21,9 @@ class Turbine:
 
     def update(self, reactorPower):
         if self.target < self.valve:
-            self.valve = round(self.valve - 0.0001, 4)
+            self.valve = round(self.valve - 0.0003, 4)
         elif self.target > self.valve:
-            self.valve = round(self.valve + 0.0001, 4)
+            self.valve = round(self.valve + 0.0003, 4)
         if not self.exploded and not self.synced and not self.triped:
             self.flow = ((reactorPower / 1000) * 1.8) * self.valve
             self.rpm += self.flow - (self.rpm / 1000)  # Simplified RPM calculation
@@ -44,10 +47,11 @@ class Turbine:
             if self.exploded:
                 self.rpm -= 5
             else:
-                self.rpm += -1
+                self.rpm -= 1
             self.powerOutput = 0
             self.hertz = self.rpm / 50
-            if self.triped and not self.exploded and self.rpm == 0:
+            if self.triped and not self.exploded and self.rpm <= 0:
+                self.rpm = 0
                 self.triped = False
         elif self.synced:
             self.flow = ((reactorPower / 1000) * 1.8) * self.valve

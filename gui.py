@@ -17,7 +17,16 @@ def update_status():
     reactor.update()
     turbine.update(reactor.powerOutput)
 
-def create_gui():
+def create_gui(debug=False):
+    if debug:
+        debug_1 = tk.Label(root, text="Reactivity = --")
+        debug_1.pack()
+
+        debug_2 = tk.Label(root, text="Meldown Reactivity = --")
+        debug_2.pack()
+
+        debug_3 = tk.Label(root, text="Angle = --")
+        debug_3.pack()
     stat_frame = tk.Frame(root, bg="lightgray", borderwidth=3, relief="ridge")
     stat_frame.place(x=5, y=5)
 
@@ -98,7 +107,7 @@ def create_gui():
     # AZ-5 Canvas
 
     az5_canvas = tk.Canvas(root, width=75, height=85, bg="black")
-    az5_canvas.place(x=171, y=100)
+    az5_canvas.place(x=171, y=160)
 
     az5_canvas.create_oval(8,8,70,70, fill="#FF0000", outline="#A40000", width=3, tags="1")
     az5_canvas.create_line(17,17,60,60, fill="#A40000", width=5)
@@ -127,7 +136,7 @@ def create_gui():
         status_label.config(text=f"Reactor {reactor.status}")
         temp_label.config(text=f"Temperature: {reactor.temperature:.1f}°C")
         power_label.config(text=f"Power Output: {reactor.powerOutput:.0f} MW")
-        rod_label.config(text=f"Control Rod Position: {int(reactor.controlRodPosition)}%")
+        rod_label.config(text=f"Control Rod Position: {reactor.controlRodPosition}%")
         rod_movement_label.config(text=f"Control Rod Movement: {reactor.rodMovementRate}")
         pump_label.config(text=f"Pumps A/B: {"ON" if reactor.pumpA else "OFF"}/{"ON" if reactor.pumpB else "OFF"}")
         turbine_label.config(text=f"Turbine Status: {turb_stat}")
@@ -135,10 +144,14 @@ def create_gui():
         turbine_power_label.config(text=f"Turbine Power Output: {turbine.powerOutput:.2f} MW")
         turbine_valve_label.config(text=f"Turbine Valve Position: {turbine.valve*100:.0f}%")
         cv_label.config(text=f"Coolant Valve: {"Open" if reactor.cvOpen else "Closed"}")
+
+        if debug:
+            debug_1.config(text=f"Reactivity = {reactor.reactivity}") # pyright: ignore[reportPossiblyUnboundVariable]
+            debug_2.config(text=f"Metldown Reactivity = {reactor.meltdownReactivity}") # pyright: ignore[reportPossiblyUnboundVariable]
+            debug_3.config(text=f"Angle = {turbine.syncroscope.angle}") # pyright: ignore[reportPossiblyUnboundVariable]
+
         root.after(int(1000/framerate), refresh)
 
     refresh()
     root.geometry("800x600")
     root.mainloop()
-
-create_gui()
