@@ -1,12 +1,14 @@
 import tkinter as tk
 import reactor as Reactor
 import turbine as Turbine
+import grid as Grid
 
 root = tk.Tk()
 root.title("Nuclear Reactor Simulator")
 
 reactor = Reactor.Reactor()
 turbine = Turbine.Turbine(root)
+grid = Grid.Grid()
 
 framerate = 60
 
@@ -58,22 +60,22 @@ def create_gui(debug=False):
     pump_label.pack(anchor="w")
 
     ignition_button = tk.Button(primary_func, text="Toggle Reactor", command=lambda: reactor.toggle_reactor())
-    ignition_button.pack()
+    ignition_button.grid(column=1, row=2)
 
     rod_up_button = tk.Button(primary_func, text="Start Raising Control Rods", command=lambda: reactor.toggle_move_rods_down())
-    rod_up_button.pack()
+    rod_up_button.grid(column=1, row=1)
 
     rod_down_button = tk.Button(primary_func, text="Start Lowering Control Rods", command=lambda: reactor.toggle_move_rods_up())
-    rod_down_button.pack()
+    rod_down_button.grid(column=1, row=3)
 
     coolant_valve_button = tk.Button(primary_func, text="Open/Close Coolant Valve",  command=lambda: reactor.toggle_coolant_valve())
-    coolant_valve_button.pack()
+    coolant_valve_button.grid(column=1, row=6)
 
     pump_alpha_button = tk.Button(primary_func, text="Toggle Pump A", command=lambda: reactor.toggle_pump_alpha())
-    pump_alpha_button.pack()
+    pump_alpha_button.grid(column=1, row=5)
 
     pump_beta_button = tk.Button(primary_func, text="Toggle Pump B", command=lambda: reactor.toggle_pump_beta())
-    pump_beta_button.pack()
+    pump_beta_button.grid(column=1, row=7)
 
     # show turbine info on the right side
 
@@ -110,6 +112,14 @@ def create_gui(debug=False):
     turbine_breaker_close = tk.Button(grid_panel, text="Close Breaker", command=lambda: turbine.close_breaker())
     turbine_breaker_close.grid(column=2,row=2)
 
+    # Grid Panel
+
+    power_order_panel = tk.Frame(root, bg="lightgray", borderwidth=3, relief="ridge", width=80, height=80)
+    power_order_panel.place(x=250, y=250)
+
+    power_given = tk.Label(power_order_panel, text="Power To Grid: 0 MW", bg="lightgray")
+    power_given.pack(anchor="w")
+
     # AZ-5 Canvas
 
     az5_canvas = tk.Canvas(root, width=75, height=85, bg="black")
@@ -125,7 +135,7 @@ def create_gui(debug=False):
         update_status()
 
         if turbine.exploded:
-            turb_stat = f"Broken {5000 - turbine.repairTimer}"
+            turb_stat = f"Broken - {((5000 - turbine.repairTimer) / 60):.1f}"
         elif turbine.triped:
             turb_stat = "Tripped"
         elif turbine.breakers:
@@ -150,6 +160,7 @@ def create_gui(debug=False):
         turbine_power_label.config(text=f"Turbine Power Output: {turbine.powerOutput:.0f} MW")
         turbine_valve_label.config(text=f"Turbine Valve Position: {turbine.valve*100:.0f}%")
         cv_label.config(text=f"Coolant Valve: {"Open" if reactor.cvOpen else "Closed"}")
+        power_given.config(text=f"Power To Grid: {int(turbine.powerOutput) if turbine.breakers else 0} MW")
 
         if debug:
             debug_1.config(text=f"Reactivity = {reactor.reactivity}") # pyright: ignore[reportPossiblyUnboundVariable]

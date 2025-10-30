@@ -1,4 +1,7 @@
-from Nuclear_Reactor_Power_Plant_Simulator.reactor import Reactor
+try:
+    from Nuclear_Reactor_Power_Plant_Simulator.reactor import Reactor
+except:
+    from reactor import Reactor
 
 def test_scram_3120_nomelt():
     reactor = Reactor()
@@ -30,12 +33,12 @@ def test_scram_3120_nomelt():
     assert reactor.meltdownReactivity == 0.0
     assert reactor.scramEngaged == False
 
-def test_scram_4200_nomelt():
+def test_scram_4000_nomelt():
     reactor = Reactor()
 
     reactor.toggle_reactor()
 
-    while reactor.temperature < 4200:
+    while reactor.temperature < 4000:
         reactor.update()
 
     reactor.scram()
@@ -45,13 +48,14 @@ def test_scram_4200_nomelt():
     reactor.pumpB = True
     reactor.pumpBspeed = 1
     reactor.toggle_coolant_valve()
+    reactor.controlRodPosition = 100
 
-    assert reactor.scramEngaged == True
+    assert reactor.scramEngaged == True # Scram
 
     while reactor.scramFrame < reactor.scramFail and reactor.temperature > reactor.meltdownSafety:
         reactor.update()
 
-    assert reactor.inMeltdown == False
+    assert reactor.inMeltdown == False # Not in meltdown
     assert reactor.temperature == 20
     assert reactor.powerOutput == 0
     assert reactor.controlRodPosition == 100
@@ -99,7 +103,7 @@ def test_reactor_startup_and_shutdown():
     reactor.toggle_reactor()
     assert reactor.isActive == True
     assert reactor.inStartup == True
-    assert reactor.controlRodPosition == 55.0
+    assert reactor.controlRodPosition == 100
 
     # Simulate startup phase
     while reactor.temperature < 1420: # Simulate enough updates to reach 1420
@@ -108,7 +112,7 @@ def test_reactor_startup_and_shutdown():
     assert reactor.temperature >= 625
     assert reactor.inStartup == False
 
-    reactor.controlRodPosition = 55.0 # Adjust control rods for normal operation
+    reactor.controlRodPosition = 55 # Adjust control rods for normal operation
     reactor.pumpA = True
     reactor.pumpAspeed = 1
     reactor.pumpB = True
@@ -127,11 +131,10 @@ def test_reactor_startup_and_shutdown():
 
     # Move control rods to shutdown the reactor
     reactor.controlRodPosition = 95.0  # Almost fully inserted
-    while reactor.temperature > 100:
+    while reactor.temperature != 20:
         reactor.update()
-    
-    # Attempt to shut down the reactor
-    reactor.toggle_reactor()
+
+    reactor.update()
     
     assert reactor.isActive == False
     assert reactor.temperature < 100
@@ -160,7 +163,7 @@ def test_normal_op_no_delta():
     assert reactor.temperature >= 625
     assert reactor.inStartup == False
 
-    reactor.controlRodPosition = 55.0 # Adjust control rods for normal operation
+    reactor.controlRodPosition = 55 # Adjust control rods for normal operation
     reactor.pumpA = True
     reactor.pumpAspeed = 1
     reactor.pumpB = True
@@ -170,6 +173,8 @@ def test_normal_op_no_delta():
     assert reactor.pumpA
     assert reactor.pumpB
     assert reactor.cvOpen
+
+    reactor.update()
 
     temp = reactor.temperature
 

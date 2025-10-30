@@ -1,4 +1,7 @@
-from Nuclear_Reactor_Power_Plant_Simulator.turbine import Turbine
+try:
+    from Nuclear_Reactor_Power_Plant_Simulator.turbine import Turbine
+except:
+    from turbine import Turbine
 from tkinter import Tk
 
 def test_sync():

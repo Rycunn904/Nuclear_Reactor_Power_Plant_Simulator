@@ -6,6 +6,7 @@ class Reactor:
 
         self.randomDelta = random.uniform(-0.001, 0.001) # Small random fluctuation
         self.stable = False
+        self.stalling = False
 
         self.reactivity = 0.0 # Initial reactivity
         self.meltdownReactivity = 0.0 # Additional reactivity during meltdown
@@ -71,13 +72,7 @@ class Reactor:
     
     def toggle_reactor(self):
         """Toggle the reactor's active state."""
-        if self.isActive:
-            if self.temperature < 100 and self.controlRodPosition > 90:
-                self.temperature = 20
-                self.powerOutput = 0
-                self.controlRodPosition = 100.0
-                self.isActive = False
-        else:
+        if not self.isActive:
             self.inStartup = True
             self.isActive = True
     
@@ -118,7 +113,9 @@ class Reactor:
                 self.controlRodPosition = round(self.controlRodPosition - 0.02, 2)
 
         # Reactor Status Update
-        if self.scramEngaged:
+        if self.stalling:
+            self.status = "Stalling"
+        elif self.scramEngaged:
             self.status = "SCRAM"
         elif self.inMeltdown:
             self.status = "Temp Critical"
@@ -153,6 +150,8 @@ class Reactor:
                 self.temperature += self.randomDelta # Minor fluctuations when stable
             else:
                 self.stable = False
+            if self.temperature <= self.meltdownSafety:
+                self.stalling = True
 
             # Power output is proportional to reactivity and temperature
         else:
@@ -187,6 +186,16 @@ class Reactor:
             print(self.scramFrame, "out of", self.scramFail, "frames until MELTDOWN!", self.temperature, "/", self.meltdownSafety)
             if self.scramFrame >= self.scramFail:
                 self.meltdownReactivity = 1.0
+        
+        if self.stalling:
+            self.isActive = False
+            if self.temperature > 20:
+                self.temperature -= 0.001
+            else:
+                self.temperature = 20
+                self.controlRodPosition = 100
+                self.rodsCanMove = False
+                self.stalling = False
 
     
     def scram(self):

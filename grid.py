@@ -11,6 +11,8 @@ class Grid:
         self.powerOrder = 0
         self.needsEnergy = False
         self.moe = 20
+        self.POcooldown = 3600
+        self.cooldownTimer = 0
     
     def new_PO(self) -> None:
         self.powerOrder = random.randint(self.minPO, self.maxPO)
@@ -18,6 +20,11 @@ class Grid:
         self.needsEnergy = True
     
     def update(self, power) -> None:
+        if self.powerOrder == 0:
+            self.cooldownTimer -= 1
+            if self.cooldownTimer == 0:
+                self.cooldownTimer = self.POcooldown
+                self.new_PO()
         self.powerIn = power
         if self.powerOrder - self.moe <= self.powerIn <= self.powerOrder + self.moe and self.time > 0:
             self.time -= 1
