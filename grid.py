@@ -22,7 +22,7 @@ class Grid:
     def update(self, power) -> None:
         if self.powerOrder == 0:
             self.cooldownTimer -= 1
-            if self.cooldownTimer == 0:
+            if self.cooldownTimer <= 0:
                 self.cooldownTimer = self.POcooldown
                 self.new_PO()
         self.powerIn = power
