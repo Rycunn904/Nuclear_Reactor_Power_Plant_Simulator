@@ -1,4 +1,4 @@
-import tkinter as t
+import tkinter as tk
 import reactor as Reactor
 import turbine as Turbine
 import grid as Grid
