@@ -37,5 +37,16 @@ jobs:
     - name: Test with pytest
       run: |
         python main.py --test-DISPLAY
-    - name: Dynamic Badges
-      uses: Schneegans/dynamic-badges-action@v1.7.0
+  badge_job:
+    runs-on: ubuntu-latest
+    steps:
+      - id: date
+        run: echo "##[set-output name=data;]$(date)"
+      - name: Time badge
+        uses: RubbaBoy/BYOB@v1.3.0
+        with:
+          NAME: time
+          LABEL: 'Updated at'
+          STATUS: ${{ steps.date.outputs.data }}
+          COLOR: 00EEFF
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
