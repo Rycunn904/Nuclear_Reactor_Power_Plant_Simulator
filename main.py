@@ -2,6 +2,9 @@ import sys
 import os
 if len(sys.argv) > 1:
     for arg in sys.argv:
+        if arg == "--test-DISPLAY":
+            os.system("python -m pytest tests/test_reactor_systems.py")
+            quit()
         if arg == "--test":
             os.system("python -m pytest")
             quit()
