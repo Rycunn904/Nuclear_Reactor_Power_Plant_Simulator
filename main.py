@@ -23,7 +23,7 @@ if len(sys.argv) > 1:
             "\n"
             "Nuclear Reactor Power Plant Simulator\n"
             "This is a small game that I have been making. It was partially inspired by Naramo Nuclear Power Plant V2 on Roblox.\n"
-            "Start the reactor, you got the rest! Go find it out!")
+            "Start the reactor and find out how to play!")
             quit()
 
 create_gui(debug=debug)

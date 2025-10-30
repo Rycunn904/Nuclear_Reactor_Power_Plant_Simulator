@@ -18,6 +18,7 @@ def scram(event):
 def update_status():
     reactor.update()
     turbine.update(reactor.powerOutput)
+    grid.update(turbine.powerOutput if turbine.breakers else 0)
 
 def create_gui(debug=False):
     if debug:
@@ -117,8 +118,11 @@ def create_gui(debug=False):
     power_order_panel = tk.Frame(root, bg="lightgray", borderwidth=3, relief="ridge", width=80, height=80)
     power_order_panel.place(x=250, y=250)
 
-    power_given = tk.Label(power_order_panel, text="Power To Grid: 0 MW", bg="lightgray")
+    power_given = tk.Label(power_order_panel, text="Power To Grid: 0 MW/Minute", bg="lightgray")
     power_given.pack(anchor="w")
+
+    power_needed = tk.Label(power_order_panel, text="Power Requested: 0 WM/Minute | --", bg="lightgray")
+    power_needed.pack(anchor="w")
 
     # AZ-5 Canvas
 
@@ -161,6 +165,7 @@ def create_gui(debug=False):
         turbine_valve_label.config(text=f"Turbine Valve Position: {turbine.valve*100:.0f}%")
         cv_label.config(text=f"Coolant Valve: {'Open' if reactor.cvOpen else 'Closed'}")
         power_given.config(text=f"Power To Grid: {int(turbine.powerOutput) if turbine.breakers else 0} MW")
+        power_needed.config(text=f"Power Needed | Sold: {grid.get_PO()} | {grid.get_power_sold()}")
 
         if debug:
             debug_1.config(text=f"Reactivity = {reactor.reactivity}") # pyright: ignore[reportPossiblyUnboundVariable]
