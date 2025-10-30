@@ -37,15 +37,25 @@ jobs:
     - name: Test with pytest
       run: |
         python main.py --test-DISPLAY
-  badge_job:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Create Awesome Badge
-        uses: schneegans/dynamic-badges-action@v1.7.0
-        with:
-          auth: ${{ secrets.GIST_SECRET }}
-          gistID: <gist-ID>
-          filename: test.json # Use test.svg if you want to use the SVG mode.
-          label: Hello
-          message: World
-          color: orange
+    - name: Badges - Readme
+      # You may pin to the exact commit or the version.
+      # uses: pemtajo/badge-readme@8f043294cd2980135ba6efb91b2b8cd64e280924
+      uses: pemtajo/badge-readme@2.4.0
+      with:
+        # GitHub access token with Repo scope
+        GH_TOKEN: ${{ github.token }} # default is ${{ github.token }}
+        # Your GitHub repository
+        REPOSITORY: ${{ github.repository }} # optional, default is ${{ github.repository }}
+        # Add a commit message of your choice
+        COMMIT_MESSAGE: Updated README with new badges # optional, default is Updated README with new badges
+        # User name used in Credly
+        CREDLY_USER: ${{ github.actor }} # optional, default is ${{ github.actor }}
+        # The sort type for return credly badges [RECENT/POPULAR]
+        CREDLY_SORT: RECENT # optional, default is RECENT
+        # Defines the badge dimension.
+        BADGE_SIZE: 110 # optional, default is 110
+        # the number of the last badges that need to show - (0 to not set limit)
+        NUMBER_LAST_BADGES: 0 # optional, default is 0
+        # The GitHub URL, can changed for enterprise github
+        GH_API_URL: https://api.github.com # optional, default is https://api.github.com
+          
