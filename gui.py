@@ -159,7 +159,7 @@ def create_gui(debug=False):
         turbine_rpm_label.config(text=f"Turbine RPM: {turbine.rpm:.0f}")
         turbine_power_label.config(text=f"Turbine Power Output: {turbine.powerOutput:.0f} MW")
         turbine_valve_label.config(text=f"Turbine Valve Position: {turbine.valve*100:.0f}%")
-        cv_label.config(text=f"Coolant Valve: {"Open" if reactor.cvOpen else "Closed"}")
+        cv_label.config(text=f"Coolant Valve: {'Open' if reactor.cvOpen else 'Closed'}")
         power_given.config(text=f"Power To Grid: {int(turbine.powerOutput) if turbine.breakers else 0} MW")
 
         if debug:
