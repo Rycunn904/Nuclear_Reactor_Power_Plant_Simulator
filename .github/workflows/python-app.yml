@@ -40,13 +40,12 @@ jobs:
   badge_job:
     runs-on: ubuntu-latest
     steps:
-      - id: date
-        run: echo "##[set-output name=data;]$(date)"
-      - name: Time badge
-        uses: RubbaBoy/BYOB@v1.3.0
+      - name: Create Awesome Badge
+        uses: schneegans/dynamic-badges-action@v1.7.0
         with:
-          NAME: time
-          LABEL: 'Updated at'
-          STATUS: ${{ steps.date.outputs.data }}
-          COLOR: 00EEFF
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: <gist-ID>
+          filename: test.json # Use test.svg if you want to use the SVG mode.
+          label: Hello
+          message: World
+          color: orange
