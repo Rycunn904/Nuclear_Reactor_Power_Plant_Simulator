@@ -1,3 +1,4 @@
+import sys
 import os
 if len(sys.argv) > 1:
     for arg in sys.argv:
@@ -5,7 +6,6 @@ if len(sys.argv) > 1:
             os.system("python -m pytest")
             quit()
 from gui import create_gui
-import sys
 
 debug = False
 
