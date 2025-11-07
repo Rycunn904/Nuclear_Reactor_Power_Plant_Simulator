@@ -165,7 +165,7 @@ def create_gui(debug=False):
         turbine_valve_label.config(text=f"Turbine Valve Position: {turbine.valve*100:.0f}%")
         cv_label.config(text=f"Coolant Valve: {'Open' if reactor.cvOpen else 'Closed'}")
         power_given.config(text=f"Power To Grid: {int(turbine.powerOutput) if turbine.breakers else 0} MW")
-        power_needed.config(text=f"Power Needed | Sold: {grid.get_PO()} | {grid.get_power_sold()}")
+        power_needed.config(text=f"Power Needed | Demand: {grid.get_PO()} | Sold: {grid.get_power_sold()}")
 
         if debug:
             debug_1.config(text=f"Reactivity = {reactor.reactivity}") # pyright: ignore[reportPossiblyUnboundVariable]

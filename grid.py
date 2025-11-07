@@ -4,9 +4,9 @@ class Grid:
     def __init__(self) -> None:
         self.powerIn = 0
         self.minPO = 160
-        self.maxPO = 400
+        self.maxPO = 410
         self.time = 0
-        self.powerOrder = 0
+        self.powerOrder = 9999
         self.needsEnergy = False
         self.moe = 20
         self.powerSold = 0
@@ -19,7 +19,9 @@ class Grid:
     def update(self, power) -> None:
         self.powerIn = power
         if self.powerOrder - self.moe <= self.powerIn <= self.powerOrder + self.moe and self.time > 0:
-            self.powerSold += (self.powerIn/60)/60
+            if int(self.powerIn) != 0:
+                self.powerSold += 0.5
+            self.time -= 1
         if self.time <= 0:
             self.new_PO()
     
